@@ -61,7 +61,7 @@ export default function Home() {
           type="text"
           value={nis}
           onChange={(e) => setNis(e.target.value)}
-          placeholder="Input NIS..."
+          placeholder="Masukkan NIS disini..."
           className="w-full p-2 rounded-md bg-white/10 border border-white/20 text-white outline-none focus:border-white/50"
         />
 
