@@ -1,65 +1,117 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "./firebaseConfig";
+import Link from "next/link";
+import { BiLink } from "react-icons/bi";
+
+// Define the structure of your student data
+interface StudentData {
+  name: string;
+  nis: string;
+  diknas: string;
+  jago_it: string;
+  pinter_ngaji: string;
+}
 
 export default function Home() {
+  const [nis, setNis] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [student, setStudent] = useState<StudentData | null>(null);
+
+  const handleSearch = async () => {
+    if (!nis) return toast.error("Please enter a NIS number");
+
+    setLoading(true);
+    setStudent(null); // Clear previous result before new search
+    
+    try {
+      const studentsRef = collection(db, "students");
+      const q = query(studentsRef, where("nis", "==", nis.trim()));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        toast.error(`Student with NIS ${nis} not found`, {
+          style: {
+            background: "rgba(255, 0, 0, 0.2)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            color: "#fff",
+          },
+        });
+      } else {
+        // Map Firestore document to our state
+        const data = querySnapshot.docs[0].data() as StudentData;
+        setStudent(data);
+      }
+    } catch (error) {
+      console.error("Error searching student:", error);
+      toast.error("An error occurred while searching.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="h-dvh flex items-center justify-center flex-col p-4">
+      <div className="flex flex-row w-full max-w-md gap-2">
+        <input
+          type="text"
+          value={nis}
+          onChange={(e) => setNis(e.target.value)}
+          placeholder="Input NIS..."
+          className="w-full p-2 rounded-md bg-white/10 border border-white/20 text-white outline-none focus:border-white/50"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+
+        <button
+          onClick={handleSearch}
+          disabled={loading}
+          className="bg-white text-black px-6 py-2 rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50 font-semibold"
+        >
+          {loading ? "..." : "Submit"}
+        </button>
+      </div>
+
+      {/* Conditional Rendering: Only show if student state is not null */}
+      {student && (
+        <div className="w-full max-w-md mt-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex flex-col gap-4 animate-in fade-in zoom-in duration-300">
+          <div>
+            <h2 className="text-2xl font-bold text-white">{student.name}</h2>
+            <p className="text-white/60">NIS: {student.nis}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Link
+              href={student.diknas}
+              target="_blank"
+              className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              Lihat Rapor Diknas
+              <BiLink size={20} />
+            </Link>
+
+            <Link
+              href={student.jago_it}
+              target="_blank"
+              className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Lihat Rapor Jago IT
+              <BiLink size={20} />
+            </Link>
+
+            <Link
+              href={student.pinter_ngaji}
+              target="_blank"
+              className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
+            >
+              Lihat Rapor Pinter Ngaji
+              <BiLink size={20} />
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+    </main>
   );
 }
