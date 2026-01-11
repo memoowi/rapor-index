@@ -6,7 +6,8 @@
 }
 
 body {
-  @apply bg-black text-white;
+  @apply text-white;
+  @apply from-black to-slate-800 bg-radial;
 }
 
 label {
@@ -17,3 +18,4 @@ input {
   @apply text-white font-medium text-xl border-2 border-white rounded-md px-4 py-2;
   @apply placeholder:italic;
 }
+
