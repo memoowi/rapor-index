@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "./firebaseConfig";
+import { analytics, db } from "./firebaseConfig";
 import Link from "next/link";
 import { BiLink } from "react-icons/bi";
+import { logEvent } from "firebase/analytics";
 
 // Define the structure of your student data
 interface StudentData {
@@ -19,6 +20,12 @@ export default function Home() {
   const [nis, setNis] = useState("");
   const [loading, setLoading] = useState(false);
   const [student, setStudent] = useState<StudentData | null>(null);
+
+  useEffect(() => {
+    if (analytics) {
+      logEvent(analytics, "page_view", { page_title: "Home" });
+    }
+  }, []);
 
   const handleSearch = async () => {
     if (!nis) return toast.error("Please enter a NIS number");
@@ -45,6 +52,12 @@ export default function Home() {
         // Map Firestore document to our state
         const data = querySnapshot.docs[0].data() as StudentData;
         setStudent(data);
+        if (analytics) {
+          logEvent(analytics, "search_student", {
+            student_name: data.name,
+            student_nis: data.nis,
+          });
+        }
       }
     } catch (error) {
       console.error("Error searching student:", error);
