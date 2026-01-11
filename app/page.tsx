@@ -25,7 +25,7 @@ export default function Home() {
 
     setLoading(true);
     setStudent(null); // Clear previous result before new search
-    
+
     try {
       const studentsRef = collection(db, "students");
       const q = query(studentsRef, where("nis", "==", nis.trim()));
@@ -112,6 +112,17 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <p className="absolute bottom-5 opacity-50">
+        Built by{" "}
+        <Link
+          href="https://github.com/memoowi"
+          target="_blank"
+          className="hover:text-sky-400"
+        >
+          Memoowi
+        </Link>
+      </p>
     </main>
   );
 }
