@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <div className="max-w-7xl mx-auto">{children}</div>
+        <div className="mx-auto">{children}</div>
         <Toaster
           position="top-center"
           toastOptions={{
