@@ -67,6 +67,12 @@ export default function Home() {
     }
   };
 
+  const onEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <main className="h-dvh flex items-center justify-center flex-col p-4">
       <div className="flex flex-row w-full max-w-md gap-2">
@@ -75,6 +81,7 @@ export default function Home() {
           value={nis}
           onChange={(e) => setNis(e.target.value)}
           placeholder="Masukkan NIS disini..."
+          onKeyDown={onEnter}
           className="w-full p-2 rounded-md bg-white/10 border border-white/20 text-white outline-none focus:border-white/50"
         />
 
@@ -96,32 +103,53 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <Link
-              href={student.diknas}
-              target="_blank"
-              className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
-            >
-              Lihat Rapor Diknas
-              <BiLink size={20} />
-            </Link>
+            {student.diknas ? (
+              <Link
+                href={student.diknas}
+                target="_blank"
+                className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
+              >
+                Lihat Rapor Diknas
+                <BiLink size={20} />
+              </Link>
+            ) : (
+              <div className="bg-white/5 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium border border-white/5 opacity-50 cursor-not-allowed">
+                Lihat Rapor Diknas
+                <BiLink size={20} />
+              </div>
+            )}
 
-            <Link
-              href={student.jago_it}
-              target="_blank"
-              className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
-            >
-              Lihat Rapor Jago IT
-              <BiLink size={20} />
-            </Link>
+            {student.jago_it ? (
+              <Link
+                href={student.jago_it}
+                target="_blank"
+                className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
+              >
+                Lihat Rapor Jago IT
+                <BiLink size={20} />
+              </Link>
+            ) : (
+              <div className="bg-white/5 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium border border-white/5 opacity-50 cursor-not-allowed">
+                Lihat Rapor Jago IT
+                <BiLink size={20} />
+              </div>
+            )}
 
-            <Link
-              href={student.pinter_ngaji}
-              target="_blank"
-              className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
-            >
-              Lihat Rapor Pinter Ngaji
-              <BiLink size={20} />
-            </Link>
+            {student.pinter_ngaji ? (
+              <Link
+                href={student.pinter_ngaji}
+                target="_blank"
+                className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
+              >
+                Lihat Rapor Pinter Ngaji
+                <BiLink size={20} />
+              </Link>
+            ) : (
+              <div className="bg-white/5 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium border border-white/5 opacity-50 cursor-not-allowed">
+                Lihat Rapor Pinter Ngaji
+                <BiLink size={20} />
+              </div>
+            )}
           </div>
         </div>
       )}
