@@ -43,7 +43,7 @@ const students = [
     nis: "2440622056",
     name: "Danish Ubaidillah Ramadhan",
     diknas: null,
-    jago_it: "https://drive.google.com/file/d/1k0YlX79kDDGNP3Qg_HTdpagqNGxaliYc/view?usp=drive_link",
+    jago_it: "https://drive.google.com/file/d/1bur8RqeGHFYVDTEqxA8Fd72XOdz_J8oW/view?usp=drive_link",
     pinter_ngaji: null,
   },
   {
