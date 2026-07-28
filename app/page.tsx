@@ -1,61 +1,169 @@
-import { Terminal } from "lucide-react";
+"use client";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { analytics, db } from "./firebaseConfig";
 import Link from "next/link";
+import { BiLink } from "react-icons/bi";
+import { logEvent } from "firebase/analytics";
 
-export default function AccessClosedPage() {
+// Define the structure of your student data
+interface StudentData {
+  name: string;
+  nis: string;
+  diknas: string;
+  jago_it: string;
+  pinter_ngaji: string;
+}
+
+export default function Home() {
+  const [nis, setNis] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [student, setStudent] = useState<StudentData | null>(null);
+
+  useEffect(() => {
+    if (analytics) {
+      logEvent(analytics, "page_view", { page_title: "Home" });
+    }
+  }, []);
+
+  const handleSearch = async () => {
+    if (!nis) return toast.error("Please enter a NIS number");
+
+    setLoading(true);
+    setStudent(null); // Clear previous result before new search
+
+    try {
+      const studentsRef = collection(db, "students");
+      const q = query(studentsRef, where("nis", "==", nis.trim()));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        toast.error(`Student with NIS ${nis} not found`, {
+          style: {
+            background: "rgba(255, 0, 0, 0.2)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            color: "#fff",
+          },
+        });
+      } else {
+        // Map Firestore document to our state
+        const data = querySnapshot.docs[0].data() as StudentData;
+        setStudent(data);
+        if (analytics) {
+          logEvent(analytics, "search_student", {
+            student_name: data.name,
+            student_nis: data.nis,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error searching student:", error);
+      toast.error("An error occurred while searching.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
-    <div className="h-dvh bg-[#050505] text-white flex flex-col items-center justify-center font-mono overflow-hidden">
-      {/* HUD Grid Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
+    <main className="h-dvh flex items-center justify-center flex-col p-4">
+      <div className="flex flex-row w-full max-w-md gap-2">
+        <input
+          type="text"
+          value={nis}
+          onChange={(e) => setNis(e.target.value)}
+          placeholder="Masukkan NIS disini..."
+          onKeyDown={onEnter}
+          className="w-full p-2 rounded-md bg-white/10 border border-white/20 text-white outline-none focus:border-white/50"
+        />
 
-      {/* Main Content */}
-      <div className="z-10 flex flex-col items-center gap-4 p-8 border border-white/10 bg-white/[0.02] backdrop-blur-md rounded-lg shadow-2xl">
-        {/* Icon Header */}
-        <div className="flex items-center gap-3 text-cyan-400">
-          <Terminal size={18} />
-          <span className="tracking-[0.2em] uppercase font-bold text-xs">
-            System_Status
-          </span>
-        </div>
-
-        {/* The Message */}
-        <div className="text-center space-y-2">
-          <svg
-            width="144"
-            height="144"
-            viewBox="0 0 144 144"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            className="mx-auto size-24 mb-4 opacity-50"
-          >
-            <path
-              d="M0,142L8,142L8,144L0,144L0,142ZM28,142L32,142L32,144L28,144L28,142ZM96,142L104,142L104,144L96,144L96,142ZM80,100L76,100L76,114L72,114L72,120L68,120L68,124L64,124L64,140L68,140L68,144L60,144L60,132L56,132L56,128L52,128L52,132L48,132L48,136L44,136L44,140L48,140L48,144L40,144L40,128L36,128L36,124L32,124L32,120L28,120L28,116L24,116L24,112L20,112L20,88L24,88L24,96L28,96L28,100L32,100L32,104L40,104L40,100L44,100L44,96L50,96L50,92L56,92L56,88L60,88L60,62L64,62L64,58L96,58L96,62L100,62L100,80L80,80L80,84L92,84L92,88L76,88L76,96L84,96L84,104L80,104L80,100ZM82,140L84,140L84,142L82,142L82,140ZM12,136L20,136L20,138L12,138L12,136ZM110,134L116,134L116,136L110,136L110,134ZM0,128L32,128L32,130L0,130L0,128ZM72,128L128,128L128,130L72,130L72,128ZM68,64L68,68L72,68L72,64L68,64Z"
-              stroke="none"
-              fill="#fff"
-            />
-          </svg>
-          <h1 className="text-3xl font-black tracking-wide text-white">
-            ACCESS_DENIED
-          </h1>
-          <p className="text-gray-400 text-sm max-w-sm">
-            ROOT_ACCESS: NULL <br />
-            EARLY_ACCESS_WINDOW: [CLOSED] <br />
-            ACADEMIC_YEAR: [ARCHIVED]
-          </p>
-        </div>
-
-        {/* CTA Button */}
-        <Link
-          href="/"
-          className="mt-4 px-8 py-3 bg-white/5 border border-white/20 hover:bg-white hover:text-black transition-all duration-300 uppercase tracking-widest text-xs font-bold"
+        <button
+          onClick={handleSearch}
+          disabled={loading}
+          className="bg-white text-black px-6 py-2 rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50 font-semibold"
         >
-          Initialize_Reboot
-        </Link>
+          {loading ? "..." : "Submit"}
+        </button>
       </div>
 
-      {/* Footer Branding */}
-      <div className="absolute bottom-8 text-[10px] text-gray-600 uppercase tracking-[0.3em]">
-        GasNugas // V.2026 // Secure Node
-      </div>
-    </div>
+      {/* Conditional Rendering: Only show if student state is not null */}
+      {student && (
+        <div className="w-full max-w-md mt-8 p-6 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex flex-col gap-4 animate-in fade-in zoom-in duration-300">
+          <div>
+            <h2 className="text-2xl font-bold text-white">{student.name}</h2>
+            <p className="text-white/60">NIS: {student.nis}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {student.diknas ? (
+              <Link
+                href={student.diknas}
+                target="_blank"
+                className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
+              >
+                Lihat Rapor Diknas
+                <BiLink size={20} />
+              </Link>
+            ) : (
+              <div className="bg-white/5 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium border border-white/5 opacity-50 cursor-not-allowed">
+                Lihat Rapor Diknas
+                <BiLink size={20} />
+              </div>
+            )}
+
+            {student.jago_it ? (
+              <Link
+                href={student.jago_it}
+                target="_blank"
+                className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
+              >
+                Lihat Rapor Jago IT
+                <BiLink size={20} />
+              </Link>
+            ) : (
+              <div className="bg-white/5 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium border border-white/5 opacity-50 cursor-not-allowed">
+                Lihat Rapor Jago IT
+                <BiLink size={20} />
+              </div>
+            )}
+
+            {student.pinter_ngaji ? (
+              <Link
+                href={student.pinter_ngaji}
+                target="_blank"
+                className="bg-white/10 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium hover:bg-white/20 transition-all border border-white/5"
+              >
+                Lihat Rapor Pinter Ngaji
+                <BiLink size={20} />
+              </Link>
+            ) : (
+              <div className="bg-white/5 w-full flex flex-row justify-between items-center p-4 rounded-lg font-medium border border-white/5 opacity-50 cursor-not-allowed">
+                Lihat Rapor Pinter Ngaji
+                <BiLink size={20} />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <p className="absolute bottom-5 opacity-50">
+        Built by{" "}
+        <Link
+          href="https://github.com/memoowi"
+          target="_blank"
+          className="hover:text-sky-400"
+        >
+          Memoowi
+        </Link>
+      </p>
+    </main>
   );
 }
