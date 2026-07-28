@@ -1,6 +1,12 @@
 import admin from "firebase-admin";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 // Use the 'with' attribute for JSON imports in Node 22
 import serviceAccount from "./serviceAccountKey.json" with { type: "json" };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -8,153 +14,62 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// ... the rest of your students array ...
+function parseCSV(filePath) {
+  const fileContent = fs.readFileSync(filePath, "utf-8");
+  const lines = fileContent.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  if (lines.length === 0) return [];
 
-const students = [
-  {
-    nis: "2440622006",
-    name: "Abrisam Rafif Maulana",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1Yw7ZDy8HHf5pH_V2qjrih86SQzJ61cLQ/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622012",
-    name: "Afrah Matsna Ardiansyah",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1Q-XKi80suggxVTaPxLE-XzZX8FSMLxAP/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622047",
-    name: "Azrililfadli An Nahl Aqleyca",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1rCMD07kbRZnXxJTRxOR906zpOOvCXxtW/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622050",
-    name: "Balakoswa Raja Malaikha",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/11k38QrzxqZh-5Tn4iwLzTW-dKRGELSVl/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622056",
-    name: "Danish Ubaidillah Ramadhan",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1bur8RqeGHFYVDTEqxA8Fd72XOdz_J8oW/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622070",
-    name: "Faeyza Yudistira",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1yhMSi8ULM4TuyPVAGb_73C68RqK6nZ-2/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622097",
-    name: "Izzan Athmar Muhammad",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1aOgV_Wd4gfUQipqBu_xPHp_KoDhYARp3/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622114",
-    name: "M Ziad Abdel Razzaq",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1RIPDUL3SZnDZpYG96uvsZBuNxtj9C8jK/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622130",
-    name: "Mufty Arifuddin Taqy",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1_tILZvBGh0HXpUnHYmIBdNftZ2VUgY3f/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622131",
-    name: "Muhamad Parisz Hidayat",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1b3U6p52Od5Uow0f1YHTIQ29vbjWq1Pdu/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622153",
-    name: "Muhammad Rafa Firdaus Mardhika",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1Z5BugssJ5MN2mADT4N1sTPrabVAgcQah/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622154",
-    name: "Muhammad Rafie Aswandi",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1LOJyIZ2M4wgc3lsYdMACNMsBrz9w29FA/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622163",
-    name: "Nabihan Uthman Raziq",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1W4wJhBAdWuiGNYdM50JkYd27drpega3t/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622173",
-    name: "Nayaka Ihsan Muttaqin",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1cq1_IlHp9R_YEWT4XHOv9Yu5YMM_NecK/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622229",
-    name: "Oh Hyun Bin",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1x-aXjVv7miEUtgP6KwsUhRSgDb_EUWsB/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622191",
-    name: "Raihan Nazhiif Yudhistira",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1FchXDs4SsuqxUEPaOVc4ws_UkzU9dAML/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622214",
-    name: "Yazid",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1l5C1dllwbWPMVDmRGhp6RhxPnTUpBUPB/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622215",
-    name: "Yazid Achmad Alhasir",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1OnajIB5aC7yrJwDuwXjALr-RK-y-1yVI/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622217",
-    name: "Yusuf Altaf Alfaruq Atmaja Rosadi",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1vvDCfEoS3Y8gjrWQnQw6sCA2LU-Gn6RB/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-  {
-    nis: "2440622219",
-    name: "Zainul Arkaan Al Insi",
-    diknas: null,
-    jago_it: "https://drive.google.com/file/d/1X5f3BqeaXcrrmfxLX5aQT34jvJ6PLtzD/view?usp=drive_link",
-    pinter_ngaji: null,
-  },
-];
+  const headers = lines[0].split(",").map((h) => h.trim());
+  const data = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    // Split by comma
+    const rowValues = line.split(",").map((v) => v.trim().replace(/^"|"$/g, ""));
+
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header] = rowValues[index] || null;
+    });
+    data.push(row);
+  }
+  return data;
+}
+
+const csvFilePath = path.join(__dirname, "data.csv");
+if (!fs.existsSync(csvFilePath)) {
+  console.error("❌ data.csv not found. Please create one based on template.csv");
+  process.exit(1);
+}
+
+const rawStudents = parseCSV(csvFilePath);
+
+const students = rawStudents.map((row) => {
+  const student = {
+    nis: row.nis,
+    name: row.name,
+  };
+
+  [1, 2, 3, 4].forEach((sem) => {
+    const diknas = row[`sem${sem}_diknas`];
+    const jago_it = row[`sem${sem}_jago_it`];
+    const pinter_ngaji = row[`sem${sem}_pinter_ngaji`];
+
+    // Only add the semester object if at least one field is provided
+    if (diknas || jago_it || pinter_ngaji) {
+      student[`semester_${sem}`] = {
+        diknas: diknas || null,
+        jago_it: jago_it || null,
+        pinter_ngaji: pinter_ngaji || null,
+      };
+    }
+  });
+
+  return student;
+});
 
 async function uploadData() {
-  console.log("🚀 Starting upload to Firestore...");
+  console.log(`🚀 Starting upload of ${students.length} students to Firestore...`);
   const batch = db.batch();
 
   students.forEach((student) => {
