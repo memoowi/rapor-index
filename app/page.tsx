@@ -14,7 +14,7 @@ export default function Home() {
   const [nis, setNis] = useState("");
   const [loading, setLoading] = useState(false);
   const [student, setStudent] = useState<StudentData | null>(null);
-  const [activeSemester, setActiveSemester] = useState<1 | 2 | 3 | 4>(1);
+  const [activeSemester, setActiveSemester] = useState<1 | 2 | 3 | 4>(4);
 
   useEffect(() => {
     if (analytics) {
@@ -27,7 +27,7 @@ export default function Home() {
 
     setLoading(true);
     setStudent(null); // Clear previous result before new search
-    setActiveSemester(1);
+    setActiveSemester(4);
 
     try {
       const studentsRef = collection(db, "students");
